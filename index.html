@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Sequential Markers — Direct Load (Absolute Paths)</title>
+  <title>Sequential Markers — Minimal Direct Load</title>
 
   <!-- A-Frame + AR.js -->
   <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
@@ -29,108 +29,147 @@
   <div class="arjs-loader"><div>Loading, please wait...</div></div>
 
   <a-scene
-    vr-mode-ui="enabled: false"
-    renderer="logarithmicDepthBuffer: true"
+    vr-mode-ui="enabled: false;"
+    renderer="logarithmicDepthBuffer: true;"
     embedded
-    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: true;"
+    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
   >
-    <!-- Marker A: contains its model directly (absolute path) -->
-    <a-nft id="markerA"
+
+    <!-- Marker A -->
+    <a-nft
+      id="markerA"
       type="nft"
       url="https://lucian-lu.github.io/trm-lab-2/nft/subway_ticket/subway_ticket"
       smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5"
     >
       <a-entity
+        class="modelA"
         gltf-model="https://lucian-lu.github.io/trm-lab-2/models/test.glb"
         scale="200 200 200"
-        position="0 0 0"
-        rotation="0 0 0"
+        position="0 0 -150"
+        rotation="-90 0 0"
+        visible="false"
       ></a-entity>
+
+      <a-text
+        class="textA"
+        value="Welcome to Little Tokyo"
+        color="white"
+        width="300"
+        rotation="-90 0 0"
+        position="-150 0 -75"
+        visible="false"
+      ></a-text>
     </a-nft>
 
-    <!-- Marker B: initially empty, will receive content when A is found -->
-    <a-nft id="markerB"
+    <!-- Marker B -->
+    <a-nft
+      id="markerB"
       type="nft"
       url="https://lucian-lu.github.io/trm-lab-2/nft/ramen_menu/ramen_menu"
       smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5"
     >
-      <!-- content added dynamically -->
+      <a-entity
+        class="modelB"
+        gltf-model="https://lucian-lu.github.io/trm-lab-2/models/test.glb"
+        scale="200 200 200"
+        position="0 0 -150"
+        rotation="-90 0 0"
+        visible="false"
+      ></a-entity>
+
+      <a-text
+        class="textB"
+        value="Sushi Bar — second stop"
+        color="white"
+        width="300"
+        rotation="-90 0 0"
+        position="-150 0 -75"
+        visible="false"
+      ></a-text>
     </a-nft>
 
-    <!-- Marker C: initially empty, will receive content when B is found -->
-    <a-nft id="markerC"
+    <!-- Marker C -->
+    <a-nft
+      id="markerC"
       type="nft"
       url="https://lucian-lu.github.io/trm-lab-2/nft/ramen_bar_entrance/ramen_bar_entrance"
       smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5"
     >
-      <!-- content added dynamically -->
+      <a-entity
+        class="modelC"
+        gltf-model="https://lucian-lu.github.io/trm-lab-2/models/test.glb"
+        scale="200 200 200"
+        position="0 0 -150"
+        rotation="-90 0 0"
+        visible="false"
+      ></a-entity>
+
+      <a-text
+        class="textC"
+        value="Ramen — final stop"
+        color="white"
+        width="300"
+        rotation="-90 0 0"
+        position="-150 0 -75"
+        visible="false"
+      ></a-text>
     </a-nft>
 
-    <a-entity camera></a-entity>
+    <!-- camera + starting text -->
+    <a-entity camera>
+      <a-text
+        id="startText"
+        value="I feel quite hungry!"
+        position="-1 0 -2"
+        color="yellow"
+        width="5"
+        scale="0.5 0.5 0.5"
+      ></a-text>
+    </a-entity>
   </a-scene>
 
   <script>
-    // flags to prevent duplicate insertion
-    let addedToB = false;
-    let addedToC = false;
+    // sequence flags
+    let scannedA = false;
+    let scannedB = false;
 
-    // absolute model URLs
-    const modelA = "https://lucian-lu.github.io/trm-lab-2/models/test.glb";
-    const modelB = "https://lucian-lu.github.io/trm-lab-2/models/test.glb";
-    const modelC = "https://lucian-lu.github.io/trm-lab-2/models/test.glb";
-
+    // marker elements
     const markerA = document.getElementById('markerA');
     const markerB = document.getElementById('markerB');
     const markerC = document.getElementById('markerC');
 
-    // when A is found: ensure B has its content (like example)
+    // helper to show model+text for a marker
+    function reveal(selectorModel, selectorText) {
+      const m = document.querySelector(selectorModel);
+      const t = document.querySelector(selectorText);
+      if (m) m.setAttribute('visible', 'true');
+      if (t) t.setAttribute('visible', 'true');
+    }
+
     markerA.addEventListener('markerFound', () => {
-      if (addedToB) return;
-      addedToB = true;
-
-      markerB.innerHTML += `
-        <a-entity
-          gltf-model="${modelB}"
-          scale="200 200 200"
-          position="0 0 0"
-          rotation="0 0 0"
-        ></a-entity>
-        <a-text
-          value="Second marker active"
-          color="magenta"
-          width="6"
-          rotation="-90 0 0"
-          position="0 0 0.2"
-        ></a-text>
-      `;
+      if (scannedA) return;
+      scannedA = true;
+      reveal('.modelA', '.textA');
+      const start = document.getElementById('startText');
+      if (start) start.setAttribute('visible', 'false');
     });
 
-    // when B is found: ensure C has its content
     markerB.addEventListener('markerFound', () => {
-      if (!addedToB) return; // enforce sequence (optional)
-      if (addedToC) return;
-      addedToC = true;
-
-      markerC.innerHTML += `
-        <a-entity
-          gltf-model="${modelC}"
-          scale="200 200 200"
-          position="0 0 0"
-          rotation="0 0 0"
-        ></a-entity>
-        <a-text
-          value="Third marker active"
-          color="cyan"
-          width="6"
-          rotation="-90 0 0"
-          position="0 0 0.2"
-        ></a-text>
-      `;
+      if (!scannedA) return; // enforce sequence
+      if (scannedB) return;
+      scannedB = true;
+      reveal('.modelB', '.textB');
     });
 
-    // hide loader after initial load attempt or a fixed time
+    markerC.addEventListener('markerFound', () => {
+      if (!scannedB) return; // enforce sequence
+      reveal('.modelC', '.textC');
+    });
+
+    // hide the loader after a short attempt to initialize
     window.addEventListener('load', () => {
-      setTimeout(()=> {
+      setTimeout(() => {
         const loader = document.querySelector('.arjs-loader');
         if (loader) loader.style.display = 'none';
       }, 8000);
