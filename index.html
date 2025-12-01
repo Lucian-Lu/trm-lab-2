@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TRM Lab 2 — Sequential Markers</title>
+  <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+</head>
+
+<style>
+  .arjs-loader {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .arjs-loader div {
+    text-align: center;
+    font-size: 1.25em;
+    color: white;
+  }
+</style>
+
+<body style="margin: 0; overflow: hidden;">
+  <div class="arjs-loader"><div>Loading, please wait...</div></div>
+
+  <a-scene
+    vr-mode-ui="enabled: false;"
+    renderer="logarithmicDepthBuffer: true;"
+    embedded
+    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: true;"
+  >
+    <!-- Marker A: subway_ticket (first) -->
+    <a-nft id="markerA"
+      type="nft"
+      url="nft/subway_ticket/subway_ticket"
+      smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
+    </a-nft>
+
+    <!-- Marker B: ramen_menu (second) -->
+    <a-nft id="markerB"
+      type="nft"
+      url="nft/ramen_menu/ramen_menu"
+      smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
+    </a-nft>
+
+    <!-- Marker C: ramen_bar_entrance (third) -->
+    <a-nft id="markerC"
+      type="nft"
+      url="nft/ramen_bar_entrance/ramen_bar_entrance"
+      smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
+    </a-nft>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+    const state = {
+      scannedA: false,
+      scannedB: false,
+      loaded: { A: false, B: false, C: false }
+    };
+
+    function createAndAttach(markerEl, opts) {
+      if (!markerEl) return;
+      if (opts._added) return;
+      opts._added = true;
+
+      const model = document.createElement('a-entity');
+      model.setAttribute('gltf-model', opts.modelPath);
+      model.setAttribute('scale', opts.scale || '100 100 100');
+      model.setAttribute('position', opts.position || '0 0 0');
+      model.setAttribute('rotation', opts.rotation || '0 0 0');
+      model.setAttribute('animation-mixer', '');
+      markerEl.appendChild(model);
+
+      const label = document.createElement('a-text');
+      label.setAttribute('value', opts.labelText || '');
+      label.setAttribute('width', opts.textWidth || '6');
+      label.setAttribute('align', 'center');
+      label.setAttribute('position', opts.textPosition || '0 0.25 0');
+      label.setAttribute('rotation', opts.textRotation || '-90 0 0');
+      markerEl.appendChild(label);
+    }
+
+    function showLockedHint(markerEl, message = 'Locked — scan previous image first') {
+      if (!markerEl) return;
+      const hint = document.createElement('a-text');
+      hint.setAttribute('value', message);
+      hint.setAttribute('width', '6');
+      hint.setAttribute('align', 'center');
+      hint.setAttribute('position', '0 0.25 0');
+      hint.setAttribute('rotation', '-90 0 0');
+      hint.setAttribute('color', 'yellow');
+      markerEl.appendChild(hint);
+      setTimeout(() => {
+        if (markerEl.contains(hint)) markerEl.removeChild(hint);
+      }, 2000);
+    }
+
+    // DOM refs
+    const mA = document.getElementById('markerA');
+    const mB = document.getElementById('markerB');
+    const mC = document.getElementById('markerC');
+
+    // Models (relative to index.html root)
+    const modelConfig = {
+      A: {
+        modelPath: 'models/little_tokyo.glb',
+        labelText: 'little_tokyo',
+        scale: '200 200 200',
+        position: '0 0 0',
+        rotation: '0 0 0'
+      },
+      B: {
+        modelPath: 'models/ramen_bar.glb',
+        labelText: 'sushi_bar',
+        scale: '200 200 200',
+        position: '0 0 0',
+        rotation: '0 0 0'
+      },
+      C: {
+        modelPath: 'models/ramen.glb',
+        labelText: 'ramed',
+        scale: '200 200 200',
+        position: '0 0 0',
+        rotation: '0 0 0'
+      }
+    };
+
+    // Marker A event: always allowed (first in sequence)
+    mA.addEventListener('markerFound', () => {
+    if (!state.loaded.A) {
+        createAndAttach(mA, modelConfig.A);
+        state.loaded.A = true;
+    }
+    state.scannedA = true;
+    console.log('marker A found — little_tokyo shown');
+
+    // DEBUG TEXT — show when first marker is scanned
+    const debugText = document.createElement('a-text');
+    debugText.setAttribute('value', 'DEBUG: FIRST MARKER SCANNED');
+    debugText.setAttribute('color', 'lime');
+    debugText.setAttribute('width', '8');
+    debugText.setAttribute('position', '0 0.5 0');
+    mA.appendChild(debugText);
+    setTimeout(() => {
+        if (mA.contains(debugText)) mA.removeChild(debugText);
+    }, 2000);
+    });
+
+
+    const debugText = document.createElement('a-text');
+        debugText.setAttribute('value', 'DEBUG: FIRST MARKER SCANNED');
+        debugText.setAttribute('color', 'lime');
+        debugText.setAttribute('width', '8');
+        debugText.setAttribute('position', '0 0.5 0');
+        mA.appendChild(debugText);
+        setTimeout(() => {
+        if (mA.contains(debugText)) mA.removeChild(debugText);
+    }, 2000);
+
+
+    // Marker B event: only after A scanned
+    mB.addEventListener('markerFound', () => {
+      if (!state.scannedA) {
+        showLockedHint(mB, 'Scan the first image to unlock this one');
+        console.log('marker B found but locked — scan A first');
+        return;
+      }
+      if (!state.loaded.B) {
+        createAndAttach(mB, modelConfig.B);
+        state.loaded.B = true;
+      }
+      state.scannedB = true;
+      console.log('marker B found — sushi_bar shown');
+    });
+
+    // Marker C event: only after B scanned
+    mC.addEventListener('markerFound', () => {
+      if (!state.scannedB) {
+        showLockedHint(mC, 'Scan the second image to unlock this one');
+        console.log('marker C found but locked — scan B first');
+        return;
+      }
+      if (!state.loaded.C) {
+        createAndAttach(mC, modelConfig.C);
+        state.loaded.C = true;
+      }
+      console.log('marker C found — ramed shown');
+    });
+
+    // hide loader
+    window.addEventListener('load', () => {
+      const loader = document.querySelector('.arjs-loader');
+      if (loader) loader.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
