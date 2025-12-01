@@ -115,11 +115,17 @@
         const markerC = document.getElementById('markerC');
 
         function reveal(selectorModel, selectorText) {
-            const m = document.querySelector(selectorModel);
-            const t = document.querySelector(selectorText);
-            if (m) m.setAttribute('visible', 'true');
-            if (t) t.setAttribute('visible', 'true');
-        }
+    // Hide all models
+    document.querySelectorAll('.modelA, .modelB, .modelC').forEach(m => m.setAttribute('visible', 'false'));
+    // Hide all texts
+    document.querySelectorAll('.textA, .textB, .textC, #startText').forEach(t => t.setAttribute('visible', 'false'));
+
+    // Show current model and text
+    const m = document.querySelector(selectorModel);
+    const t = document.querySelector(selectorText);
+    if (m) m.setAttribute('visible', 'true');
+    if (t) t.setAttribute('visible', 'true');
+}
 
         markerA.addEventListener('markerFound', () => {
             if (scannedA) return;
