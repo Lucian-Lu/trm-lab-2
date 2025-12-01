@@ -135,36 +135,27 @@
 
     // Marker A event: always allowed (first in sequence)
     mA.addEventListener('markerFound', () => {
-    if (!state.loaded.A) {
+      if (!state.loaded.A) {
         createAndAttach(mA, modelConfig.A);
         state.loaded.A = true;
-    }
-    state.scannedA = true;
-    console.log('marker A found — little_tokyo shown');
+      }
+      state.scannedA = true;
+      console.log('marker A found — little_tokyo shown');
 
-    // DEBUG TEXT — show when first marker is scanned
-    const debugText = document.createElement('a-text');
-    debugText.setAttribute('value', 'DEBUG: FIRST MARKER SCANNED');
-    debugText.setAttribute('color', 'lime');
-    debugText.setAttribute('width', '8');
-    debugText.setAttribute('position', '0 0.5 0');
-    mA.appendChild(debugText);
-    setTimeout(() => {
-        if (mA.contains(debugText)) mA.removeChild(debugText);
-    }, 2000);
-    });
-
-
-    const debugText = document.createElement('a-text');
+      // DEBUG TEXT — show when first marker is scanned (only once)
+      if (!mA.querySelector('[data-debug="first"]')) {
+        const debugText = document.createElement('a-text');
         debugText.setAttribute('value', 'DEBUG: FIRST MARKER SCANNED');
         debugText.setAttribute('color', 'lime');
         debugText.setAttribute('width', '8');
         debugText.setAttribute('position', '0 0.5 0');
+        debugText.setAttribute('data-debug', 'first');
         mA.appendChild(debugText);
         setTimeout(() => {
-        if (mA.contains(debugText)) mA.removeChild(debugText);
-    }, 2000);
-
+          if (mA.contains(debugText)) mA.removeChild(debugText);
+        }, 2000);
+      }
+    });
 
     // Marker B event: only after A scanned
     mB.addEventListener('markerFound', () => {
