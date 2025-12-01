@@ -2,161 +2,172 @@
 <html>
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-    <title>TRM Lab 2</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>TRM Lab 2 - fixed texts</title>
 
-    <script
-        src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
 
-        .arjs-loader {
-            height: 100%;
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    .arjs-loader {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .arjs-loader div {
-            text-align: center;
-            font-size: 1.25em;
-            color: white;
-        }
-    </style>
+    .arjs-loader div {
+      text-align: center;
+      font-size: 1.25em;
+      color: white;
+    }
+  </style>
 </head>
 
 <body style="margin:0; overflow:hidden;">
-    <div class="arjs-loader">
-        <div>Loading AR system — please wait...</div>
-    </div>
+  <div class="arjs-loader">
+    <div>Loading AR system — please wait...</div>
+  </div>
 
-    <a-scene vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true" embedded
-        arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
+  <a-scene vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true" embedded
+    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;">
 
-        <a-nft id="markerA" type="nft" url="https://lucian-lu.github.io/trm-lab-2/nft/subway_ticket/subway_ticket"
-            smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
-            <a-entity class="modelA" gltf-model="https://lucian-lu.github.io/trm-lab-2/models/little_tokyo.glb"
-                scale="0.1 0.1 0.1" position="25 0 -25" rotation="-90 0 0" visible="false"></a-entity>
+    <!-- MARKERS + MODELS (texts removed from markers) -->
+    <a-nft id="markerA" type="nft"
+      url="https://lucian-lu.github.io/trm-lab-2/nft/subway_ticket/subway_ticket"
+      smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
+      <a-entity class="modelA" gltf-model="https://lucian-lu.github.io/trm-lab-2/models/little_tokyo.glb"
+        scale="0.1 0.1 0.1" position="0 0 0" rotation="-90 0 0" visible="false"></a-entity>
+    </a-nft>
 
-<a-text class="textA"
+    <a-nft id="markerB" type="nft"
+      url="https://lucian-lu.github.io/trm-lab-2/nft/ramen_bar_entrance/ramen_bar_entrance" smooth="true"
+      smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
+      <a-entity class="modelB" gltf-model="https://lucian-lu.github.io/trm-lab-2/models/ramen_bar.glb"
+        scale="3 3 3" position="0 0 0" rotation="-90 0 0" visible="false"></a-entity>
+    </a-nft>
+
+    <a-nft id="markerC" type="nft" url="https://lucian-lu.github.io/trm-lab-2/nft/ramen_menu/ramen_menu"
+      smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
+      <a-entity class="modelC" gltf-model="https://lucian-lu.github.io/trm-lab-2/models/ramen.glb"
+        scale="5 5 5" position="0 0 0" rotation="-90 0 0" visible="false"></a-entity>
+    </a-nft>
+
+    <!-- CAMERA-ANCHORED TEXTS (always placed in front of the camera) -->
+    <a-entity camera id="cameraRig">
+      <!-- Start text visible initially -->
+      <a-text id="startText"
+        value="I feel quite hungry! Time to go out."
+        position="-0.9 -0.6 -1.6"
+        color="yellow"
+        width="2.5"
+        align="left"
+        anchor="left">
+      </a-text>
+
+      <!-- Marker-triggered texts: positioned directly in front of the camera,
+           upright (no rotation), centered horizontally -->
+      <a-text class="textA"
         value="Now to find somewhere to eat..."
         color="red"
-        width="2"
+        width="1.8"
         align="center"
         anchor="center"
-        look-at="[camera]"
+        position="0 -0.1 -1.2"
         rotation="0 0 0"
-        position="0 0.5 0"
         scale="1 1 1"
         visible="false">
-</a-text>
-        </a-nft>
+      </a-text>
 
-        <a-nft id="markerB" type="nft"
-            url="https://lucian-lu.github.io/trm-lab-2/nft/ramen_bar_entrance/ramen_bar_entrance" smooth="true"
-            smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
-            <a-entity class="modelB" gltf-model="https://lucian-lu.github.io/trm-lab-2/models/ramen_bar.glb"
-                scale="3 3 3" position="10 0 -5" rotation="-90 0 0" visible="false"></a-entity>
-
-<a-text class="textB"
+      <a-text class="textB"
         value="I think I'll get some ramen."
         color="blue"
         width="1.8"
         align="center"
         anchor="center"
-        look-at="[camera]"
+        position="0 -0.1 -1.2"
         rotation="0 0 0"
-        position="0 0.6 0"
         scale="0.9 0.9 0.9"
         visible="false">
-</a-text>
-        </a-nft>
+      </a-text>
 
-        <a-nft id="markerC" type="nft" url="https://lucian-lu.github.io/trm-lab-2/nft/ramen_menu/ramen_menu"
-            smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
-            <a-entity class="modelC" gltf-model="https://lucian-lu.github.io/trm-lab-2/models/ramen.glb" scale="5 5 5"
-                position="0 0 -4" rotation="-90 0 0" visible="false"></a-entity>
-
-<a-text class="textC"
+      <a-text class="textC"
         value="Mmm tasty. Ramen is the best."
         color="white"
-        width="2.5"
+        width="2.2"
         align="center"
         anchor="center"
-        look-at="[camera]"
+        position="0 -0.1 -1.2"
         rotation="0 0 0"
-        position="0 0.7 0"
         scale="0.9 0.9 0.9"
         visible="false">
-</a-text>
-        </a-nft>
+      </a-text>
+    </a-entity>
 
-        <a-entity camera>
-            <a-text id="startText" value="I feel quite hungry! Time to go out." position="-1 -0.75 -5" color="yellow"
-                width="2.5" scale="1 1 1" rotation="0 0 0" align="left" anchor="left">
-            </a-text>
+  </a-scene>
 
-        </a-entity>
-    </a-scene>
+  <script>
+    let scannedA = false;
+    let scannedB = false;
 
-    <script>
-        let scannedA = false;
-        let scannedB = false;
+    const markerA = document.getElementById('markerA');
+    const markerB = document.getElementById('markerB');
+    const markerC = document.getElementById('markerC');
 
-        const markerA = document.getElementById('markerA');
-        const markerB = document.getElementById('markerB');
-        const markerC = document.getElementById('markerC');
+    // Reveal model + camera-anchored text by selector.
+    function reveal(selectorModel, selectorText) {
+      const m = document.querySelector(selectorModel);
+      const t = document.querySelector(selectorText);
+      if (m) m.setAttribute('visible', 'true');
+      if (t) t.setAttribute('visible', 'true');
+    }
 
-        function reveal(selectorModel, selectorText) {
-            const m = document.querySelector(selectorModel);
-            const t = document.querySelector(selectorText);
-            if (m) m.setAttribute('visible', 'true');
-            if (t) t.setAttribute('visible', 'true');
-        }
+    markerA.addEventListener('markerFound', () => {
+      if (scannedA) return;
+      scannedA = true;
+      reveal('.modelA', '.textA');
 
-        markerA.addEventListener('markerFound', () => {
-            if (scannedA) return;
-            scannedA = true;
-            reveal('.modelA', '.textA');
-            const start = document.getElementById('startText');
-            if (start) start.setAttribute('visible', 'false');
-        });
+      // hide start text when first marker found
+      const start = document.getElementById('startText');
+      if (start) start.setAttribute('visible', 'false');
+    });
 
-        markerB.addEventListener('markerFound', () => {
-            if (!scannedA) return;
-            if (scannedB) return;
-            scannedB = true;
-            reveal('.modelB', '.textB');
-        });
+    markerB.addEventListener('markerFound', () => {
+      if (!scannedA) return;
+      if (scannedB) return;
+      scannedB = true;
+      reveal('.modelB', '.textB');
+    });
 
-        markerC.addEventListener('markerFound', () => {
-            if (!scannedB) return;
-            reveal('.modelC', '.textC');
-        });
+    markerC.addEventListener('markerFound', () => {
+      if (!scannedB) return;
+      reveal('.modelC', '.textC');
+    });
 
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const loader = document.querySelector('.arjs-loader');
-                if (loader) loader.style.display = 'none';
-            }, 7000);
-        });
-    </script>
+    // hide loader after a short delay
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loader = document.querySelector('.arjs-loader');
+        if (loader) loader.style.display = 'none';
+      }, 7000);
+    });
+  </script>
 </body>
 
 </html>
