@@ -73,35 +73,17 @@
                 width="2.5" scale="1 1 1" rotation="0 0 0" align="left" anchor="left">
             </a-text>
 
-            <a-text class="textA"
-        value="Now to find somewhere to eat..."
-        color="red"
-        width="2.5"
-        rotation="0 0 0"
-        position="-1 -0.75 -5"
-        scale="1 1 1"
-        visible="false">
-</a-text>
+            <a-text class="textA" value="Now to find somewhere to eat..." color="orange" width="2.5" rotation="0 0 0"
+                position="-1 -0.75 -5" scale="1 1 1" visible="false">
+            </a-text>
 
-<a-text class="textB"
-        value="I think I'll get some ramen."
-        color="blue"
-        width="2.5"
-        rotation="0 0 0"
-        position="-1 -0.75 -5"
-        scale="1 1 1"
-        visible="false">
-</a-text>
+            <a-text class="textB" value="I think I'll get some ramen." color="red" width="2.5" rotation="0 0 0"
+                position="-1 -0.75 -5" scale="1 1 1" visible="false">
+            </a-text>
 
-<a-text class="textC"
-        value="Mmm tasty. Ramen is the best."
-        color="white"
-        width="2.5"
-        rotation="0 0 0"
-        position="-1 -0.75 -5"
-        scale="1 1 1"
-        visible="false">
-</a-text>
+            <a-text class="textC" value="Mmm tasty. Ramen is the best." color="coral" width="2.5" rotation="0 0 0"
+                position="-1 -0.75 -5" scale="1 1 1" visible="false">
+            </a-text>
 
         </a-entity>
     </a-scene>
@@ -122,37 +104,33 @@
         }
 
         markerA.addEventListener('markerFound', () => {
-    if (scannedA) return;
-    scannedA = true;
-    // Hide start text
-    const start = document.getElementById('startText');
-    if (start) start.setAttribute('visible', 'false');
+            if (scannedA) return;
+            scannedA = true;
+            const start = document.getElementById('startText');
+            if (start) start.setAttribute('visible', 'false');
 
-    // Show text A and model A
-    reveal('.modelA', '.textA');
-});
+            reveal('.modelA', '.textA');
+        });
 
-markerB.addEventListener('markerFound', () => {
-    if (!scannedA) return;
-    if (scannedB) return;
-    scannedB = true;
+        markerB.addEventListener('markerFound', () => {
+            if (!scannedA) return;
+            if (scannedB) return;
+            scannedB = true;
 
-    // Hide previous text
-    const textA = document.querySelector('.textA');
-    if (textA) textA.setAttribute('visible', 'false');
+            const textA = document.querySelector('.textA');
+            if (textA) textA.setAttribute('visible', 'false');
 
-    reveal('.modelB', '.textB');
-});
+            reveal('.modelB', '.textB');
+        });
 
-markerC.addEventListener('markerFound', () => {
-    if (!scannedB) return;
+        markerC.addEventListener('markerFound', () => {
+            if (!scannedB) return;
 
-    // Hide previous text
-    const textB = document.querySelector('.textB');
-    if (textB) textB.setAttribute('visible', 'false');
+            const textB = document.querySelector('.textB');
+            if (textB) textB.setAttribute('visible', 'false');
 
-    reveal('.modelC', '.textC');
-});
+            reveal('.modelC', '.textC');
+        });
     </script>
 </body>
 
