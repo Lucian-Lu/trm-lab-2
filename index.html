@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <title>Sequential Markers — Minimal Direct Load</title>
 
-  <!-- A-Frame + AR.js -->
   <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
@@ -35,7 +34,6 @@
     arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
   >
 
-    <!-- Marker A -->
     <a-nft
       id="markerA"
       type="nft"
@@ -44,7 +42,7 @@
     >
       <a-entity
         class="modelA"
-        gltf-model="https://lucian-lu.github.io/trm-lab-2/models/test.glb"
+        gltf-model="https://lucian-lu.github.io/trm-lab-2/models/little_tokyo.glb"
         scale="200 200 200"
         position="0 0 -150"
         rotation="-90 0 0"
@@ -62,25 +60,24 @@
       ></a-text>
     </a-nft>
 
-    <!-- Marker B -->
     <a-nft
       id="markerB"
       type="nft"
-      url="https://lucian-lu.github.io/trm-lab-2/nft/ramen_menu/ramen_menu"
+      url="https://lucian-lu.github.io/trm-lab-2/nft/ramen_menu/ramen_bar_entrance"
       smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5"
     >
       <a-entity
         class="modelB"
-        gltf-model="https://lucian-lu.github.io/trm-lab-2/models/test.glb"
+        gltf-model="https://lucian-lu.github.io/trm-lab-2/models/ramen_bar.glb"
         scale="200 200 200"
         position="0 0 -150"
-        rotation="-90 0 0"
+        rotation="90 -180 0"
         visible="false"
       ></a-entity>
 
       <a-text
         class="textB"
-        value="Sushi Bar — second stop"
+        value="Yum yum yum I want some ramen"
         color="white"
         width="300"
         rotation="-90 0 0"
@@ -89,25 +86,24 @@
       ></a-text>
     </a-nft>
 
-    <!-- Marker C -->
     <a-nft
       id="markerC"
       type="nft"
-      url="https://lucian-lu.github.io/trm-lab-2/nft/ramen_bar_entrance/ramen_bar_entrance"
+      url="https://lucian-lu.github.io/trm-lab-2/nft/ramen_bar_entrance/ramen_menu"
       smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5"
     >
       <a-entity
         class="modelC"
-        gltf-model="https://lucian-lu.github.io/trm-lab-2/models/test.glb"
+        gltf-model="https://lucian-lu.github.io/trm-lab-2/models/ramen.glb"
         scale="200 200 200"
         position="0 0 -150"
-        rotation="-90 0 0"
+        rotation="90 -180 0"
         visible="false"
       ></a-entity>
 
       <a-text
         class="textC"
-        value="Ramen — final stop"
+        value="Mmmh tasty"
         color="white"
         width="300"
         rotation="-90 0 0"
@@ -116,7 +112,6 @@
       ></a-text>
     </a-nft>
 
-    <!-- camera + starting text -->
     <a-entity camera>
       <a-text
         id="startText"
@@ -130,16 +125,13 @@
   </a-scene>
 
   <script>
-    // sequence flags
     let scannedA = false;
     let scannedB = false;
 
-    // marker elements
     const markerA = document.getElementById('markerA');
     const markerB = document.getElementById('markerB');
     const markerC = document.getElementById('markerC');
 
-    // helper to show model+text for a marker
     function reveal(selectorModel, selectorText) {
       const m = document.querySelector(selectorModel);
       const t = document.querySelector(selectorText);
@@ -156,18 +148,17 @@
     });
 
     markerB.addEventListener('markerFound', () => {
-      if (!scannedA) return; // enforce sequence
+      if (!scannedA) return;
       if (scannedB) return;
       scannedB = true;
       reveal('.modelB', '.textB');
     });
 
     markerC.addEventListener('markerFound', () => {
-      if (!scannedB) return; // enforce sequence
+      if (!scannedB) return;
       reveal('.modelC', '.textC');
     });
 
-    // hide the loader after a short attempt to initialize
     window.addEventListener('load', () => {
       setTimeout(() => {
         const loader = document.querySelector('.arjs-loader');
