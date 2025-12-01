@@ -56,6 +56,9 @@
     embedded
     arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
   >
+    <!-- assets container (we'll add a-asset-item dynamically on demand) -->
+    <a-assets id="assets"></a-assets>
+
     <a-nft id="markerA" type="nft" url="nft/subway_ticket/subway_ticket"
         smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
     </a-nft>
@@ -68,67 +71,173 @@
         smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5">
     </a-nft>
 
-    <a-entity camera></a-entity>
+    <a-entity camera>
+      <!-- starting text visible until the first marker is scanned -->
+      <a-text
+        id="startText"
+        value="I feel quite hungry!"
+        position="-1 0 -2"
+        color="yellow"
+        width="5"
+        scale="0.5 0.5 0.5"
+      ></a-text>
+    </a-entity>
   </a-scene>
 
 <script>
+  // --- state + DOM refs ---
   const state = { scannedA: false, scannedB: false, loaded: { A: false, B: false, C: false } };
   const hintEl = document.getElementById('hint');
   const loaderEl = document.querySelector('.arjs-loader');
+  const assets = document.getElementById('assets');
+  const startText = document.getElementById('startText');
 
-    const modelConfig = {
+  const modelConfig = {
     A: { path: 'models/little_tokyo.glb', scale: '200 200 200', label: 'little_tokyo' },
     B: { path: 'models/ramen_bar.glb', scale: '200 200 200', label: 'sushi_bar' },
     C: { path: 'models/ramen.glb', scale: '200 200 200', label: 'ramen' }
-    };
+  };
 
   const mA = document.getElementById('markerA');
   const mB = document.getElementById('markerB');
   const mC = document.getElementById('markerC');
 
-  function showHint(msg, time=2000){
+  function showHint(msg, time=3000){
+    console.log('[HINT]', msg);
     hintEl.textContent = msg;
     hintEl.style.display = 'block';
     setTimeout(()=>{ hintEl.style.display='none'; }, time);
   }
 
+  // Create lazy wrapper container inside a marker (only once)
   function createLazyModel(markerEl, cfg){
     if(markerEl._lazyAdded) return;
     markerEl._lazyAdded = true;
     const wrapper = document.createElement('a-entity');
     wrapper.setAttribute('visible','false');
+    // default transform; you can tweak per-model
     wrapper.setAttribute('scale',cfg.scale || '100 100 100');
+    wrapper.setAttribute('rotation','-90 0 0');
     markerEl.appendChild(wrapper);
     markerEl._wrapper = wrapper;
   }
 
-  function loadModel(markerEl,key){
+  // Create an <a-asset-item> for the file, add to <a-assets>, return the element
+  function createAssetItemForKey(key, cfg){
+    const assetId = `asset-${key}`;
+    if(document.getElementById(assetId)) return document.getElementById(assetId);
+
+    const ai = document.createElement('a-asset-item');
+    ai.setAttribute('id', assetId);
+    ai.setAttribute('src', cfg.path);
+    // add crossorigin in case of CORS issues
+    ai.setAttribute('crossorigin', 'anonymous');
+    assets.appendChild(ai);
+    return ai;
+  }
+
+  // Load model on demand using an asset reference -> #asset-key for gltf-model.
+  // This avoids some oddities with direct file URLs and gives a better 'loaded' lifecycle.
+  function loadModel(markerEl, key){
     if(!modelConfig[key] || state.loaded[key]) return;
     const cfg = modelConfig[key];
-    createLazyModel(markerEl,cfg);
+    console.log(`[LOAD] request ${key} -> ${cfg.path}`);
 
+    createLazyModel(markerEl, cfg);
+
+    // Add asset item (will start the browser download)
+    const assetItem = createAssetItemForKey(key, cfg);
+
+    // Create the visible model entity that references the asset via id
     const modelEl = document.createElement('a-entity');
-    modelEl.setAttribute('gltf-model',cfg.path);
-    modelEl.setAttribute('scale',cfg.scale);
-    modelEl.setAttribute('animation-mixer','');
+    modelEl.setAttribute('gltf-model', `#asset-${key}`);
+    modelEl.setAttribute('scale', cfg.scale);
+    modelEl.setAttribute('animation-mixer', '');
+    modelEl.setAttribute('visible', 'false'); // show only after model-loaded
+    // If you want to position the model inside the wrapper: modelEl.setAttribute('position','0 0 -150');
 
-    let timeout = setTimeout(()=>{ showHint('Model load timeout, maybe large file',4000); },15000);
-    modelEl.addEventListener('model-loaded',()=>{ clearTimeout(timeout); state.loaded[key]=true; markerEl._wrapper.setAttribute('visible','true'); loaderEl.style.display='none'; });
-    modelEl.addEventListener('error',()=>{ clearTimeout(timeout); showHint('Error loading model',4000); });
+    // Timeout handler if loading takes very long
+    let timeout = setTimeout(()=>{
+      console.warn('[TIMEOUT] model load timed out for', cfg.path);
+      showHint('Model load timeout (large file). Try compressing or host closer to the page.', 5000);
+    }, 20000);
 
+    // model-loaded fires on the entity once the glTF has finished loading
+    modelEl.addEventListener('model-loaded', (evt)=>{
+      clearTimeout(timeout);
+      state.loaded[key] = true;
+      console.log('[MODEL LOAD] success for', cfg.path, evt);
+      // show the wrapper & model
+      markerEl._wrapper.setAttribute('visible','true');
+      modelEl.setAttribute('visible','true');
+      loaderEl.style.display = 'none';
+      showHint(`Model ${cfg.label} loaded`, 2000);
+    });
+
+    modelEl.addEventListener('error', (err)=>{
+      clearTimeout(timeout);
+      console.error('[MODEL ERROR]', err);
+      showHint('Error loading model — check console for details', 5000);
+    });
+
+    // Append the model entity to the wrapper (this triggers the download/load)
     markerEl._wrapper.appendChild(modelEl);
   }
 
+  // prepare wrappers (no network yet)
   createLazyModel(mA,modelConfig.A);
   createLazyModel(mB,modelConfig.B);
   createLazyModel(mC,modelConfig.C);
 
-  mA.addEventListener('markerFound',()=>{ if(!state.loaded.A) loadModel(mA,'A'); state.scannedA=true; showHint('First marker scanned'); });
-  mB.addEventListener('markerFound',()=>{ if(!state.scannedA){ showHint('Scan first marker'); return; } if(!state.loaded.B) loadModel(mB,'B'); state.scannedB=true; showHint('Second marker scanned'); });
-  mC.addEventListener('markerFound',()=>{ if(!state.scannedB){ showHint('Scan second marker'); return; } if(!state.loaded.C) loadModel(mC,'C'); showHint('Third marker scanned'); });
+  // marker event handlers
+  mA.addEventListener('markerFound', ()=>{
+    console.log('[MARKER] A found');
+    if(!state.loaded.A) loadModel(mA,'A');
+    state.scannedA = true;
+    showHint('First marker scanned');
+    // hide start text when the story begins
+    if(startText) startText.setAttribute('visible', 'false');
+  });
 
-  // remove loader after 10s max
-  window.addEventListener('load',()=>{ setTimeout(()=>loaderEl.style.display='none',10000); });
+  mB.addEventListener('markerFound', ()=>{
+    console.log('[MARKER] B found');
+    if(!state.scannedA){
+      showHint('Scan first marker first');
+      return;
+    }
+    if(!state.loaded.B) loadModel(mB,'B');
+    state.scannedB = true;
+    showHint('Second marker scanned');
+  });
+
+  mC.addEventListener('markerFound', ()=>{
+    console.log('[MARKER] C found');
+    if(!state.scannedB){
+      showHint('Scan second marker first');
+      return;
+    }
+    if(!state.loaded.C) loadModel(mC,'C');
+    showHint('Third marker scanned');
+  });
+
+  // remove loader after 10s max (safety)
+  window.addEventListener('load', ()=>{ setTimeout(()=>loaderEl.style.display='none',10000); });
+
+  // extra debug help: detect if assets folder 404s quickly (non-invasive check)
+  (function quickPathCheck(){
+    Object.entries(modelConfig).forEach(([k,cfg])=>{
+      // tiny request to check availability — won't download whole file for most servers (HEAD might be blocked by CORS)
+      // We'll attempt a fetch with method HEAD then fallback to GET if CORS refuses.
+      fetch(cfg.path, { method: 'HEAD' }).then(resp=>{
+        if(!resp.ok) console.warn(`[CHECK] HEAD ${cfg.path} => ${resp.status}`);
+        else console.log(`[CHECK] HEAD ${cfg.path} OK`);
+      }).catch(err=>{
+        // HEAD often blocked by CORS on raw GitHub paths; not fatal — you'll see real errors in console when loading.
+        console.log(`[CHECK] HEAD failed for ${cfg.path} (CORS or network):`, err);
+      });
+    });
+  })();
+
 </script>
 </body>
 </html>
