@@ -2,13 +2,14 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Sequential Markers — Minimal Direct Load</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>TRM Lab 2</title>
 
   <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
   <style>
-    body { margin: 0; overflow: hidden; }
+    body { margin: 0; overflow: hidden; -webkit-touch-callout: none; -webkit-user-select: none; -ms-user-select: none; user-select: none; }
     .arjs-loader {
       height: 100%;
       width: 100%;
@@ -25,11 +26,11 @@
 </head>
 
 <body style="margin:0; overflow:hidden;">
-  <div class="arjs-loader"><div>Loading, please wait...</div></div>
+  <div class="arjs-loader"><div>Loading AR system — please wait...</div></div>
 
   <a-scene
-    vr-mode-ui="enabled: false;"
-    renderer="logarithmicDepthBuffer: true;"
+    vr-mode-ui="enabled: false"
+    renderer="logarithmicDepthBuffer: true"
     embedded
     arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
   >
@@ -40,12 +41,13 @@
       url="https://lucian-lu.github.io/trm-lab-2/nft/subway_ticket/subway_ticket"
       smooth="true" smoothCount="10" smoothTolerance=".01" smoothThreshold="5"
     >
+      <!-- Model: upright, rotated so it sits naturally on the marker plane -->
       <a-entity
         class="modelA"
         gltf-model="https://lucian-lu.github.io/trm-lab-2/models/little_tokyo.glb"
-        scale="500 500 200"
-        position="0 0 0"
-        rotation="0 0 0"
+        scale="200 200 200"
+        position="0 0 -120"
+        rotation="-90 0 0"
         visible="false"
       ></a-entity>
 
@@ -54,8 +56,8 @@
         value="Welcome to Little Tokyo"
         color="red"
         width="100"
-        rotation="0 0 0"
-        position="0 0 0"
+        rotation="-90 0 0"
+        position="0 -60 -120"
         visible="false"
       ></a-text>
     </a-nft>
@@ -69,19 +71,19 @@
       <a-entity
         class="modelB"
         gltf-model="https://lucian-lu.github.io/trm-lab-2/models/ramen_bar.glb"
-        scale="500 500 200"
-        position="0 0 0"
-        rotation="0 0 0"
+        scale="200 200 200"
+        position="0 0 -120"
+        rotation="-90 0 0"
         visible="false"
       ></a-entity>
 
       <a-text
         class="textB"
-        value="Yum yum yum I want some ramen"
+        value="Yum — ramen time"
         color="blue"
-        width="300"
-        rotation="0 0 0"
-        position="0 0 0"
+        width="200"
+        rotation="-90 0 0"
+        position="0 -60 -120"
         visible="false"
       ></a-text>
     </a-nft>
@@ -95,9 +97,9 @@
       <a-entity
         class="modelC"
         gltf-model="https://lucian-lu.github.io/trm-lab-2/models/ramen.glb"
-        scale="500 500 200"
-        position="0 0 0"
-        rotation="0 0 0"
+        scale="200 200 200"
+        position="0 0 -120"
+        rotation="-90 0 0"
         visible="false"
       ></a-entity>
 
@@ -105,9 +107,9 @@
         class="textC"
         value="Mmmh tasty"
         color="white"
-        width="300"
-        rotation="0 0 0"
-        position="0 0 0"
+        width="200"
+        rotation="-90 0 0"
+        position="0 -60 -120"
         visible="false"
       ></a-text>
     </a-nft>
@@ -116,10 +118,10 @@
       <a-text
         id="startText"
         value="I feel quite hungry!"
-        position="0 0 0"
+        position="-0.6 0 -1.5"
         color="yellow"
-        width="5"
-        scale="1 1 1"
+        width="2"
+        scale="0.7 0.7 0.7"
       ></a-text>
     </a-entity>
   </a-scene>
@@ -163,7 +165,7 @@
       setTimeout(() => {
         const loader = document.querySelector('.arjs-loader');
         if (loader) loader.style.display = 'none';
-      }, 8000);
+      }, 7000);
     });
   </script>
 </body>
