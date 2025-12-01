@@ -115,44 +115,44 @@
         const markerC = document.getElementById('markerC');
 
         function reveal(selectorModel, selectorText) {
-    // Hide all models
-    document.querySelectorAll('.modelA, .modelB, .modelC').forEach(m => m.setAttribute('visible', 'false'));
-    // Hide all texts
-    document.querySelectorAll('.textA, .textB, .textC, #startText').forEach(t => t.setAttribute('visible', 'false'));
-
-    // Show current model and text
-    const m = document.querySelector(selectorModel);
-    const t = document.querySelector(selectorText);
-    if (m) m.setAttribute('visible', 'true');
-    if (t) t.setAttribute('visible', 'true');
-}
+            const m = document.querySelector(selectorModel);
+            const t = document.querySelector(selectorText);
+            if (m) m.setAttribute('visible', 'true');
+            if (t) t.setAttribute('visible', 'true');
+        }
 
         markerA.addEventListener('markerFound', () => {
-            if (scannedA) return;
-            scannedA = true;
-            reveal('.modelA', '.textA');
-            const start = document.getElementById('startText');
-            if (start) start.setAttribute('visible', 'false');
-        });
+    if (scannedA) return;
+    scannedA = true;
+    // Hide start text
+    const start = document.getElementById('startText');
+    if (start) start.setAttribute('visible', 'false');
 
-        markerB.addEventListener('markerFound', () => {
-            if (!scannedA) return;
-            if (scannedB) return;
-            scannedB = true;
-            reveal('.modelB', '.textB');
-        });
+    // Show text A and model A
+    reveal('.modelA', '.textA');
+});
 
-        markerC.addEventListener('markerFound', () => {
-            if (!scannedB) return;
-            reveal('.modelC', '.textC');
-        });
+markerB.addEventListener('markerFound', () => {
+    if (!scannedA) return;
+    if (scannedB) return;
+    scannedB = true;
 
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const loader = document.querySelector('.arjs-loader');
-                if (loader) loader.style.display = 'none';
-            }, 7000);
-        });
+    // Hide previous text
+    const textA = document.querySelector('.textA');
+    if (textA) textA.setAttribute('visible', 'false');
+
+    reveal('.modelB', '.textB');
+});
+
+markerC.addEventListener('markerFound', () => {
+    if (!scannedB) return;
+
+    // Hide previous text
+    const textB = document.querySelector('.textB');
+    if (textB) textB.setAttribute('visible', 'false');
+
+    reveal('.modelC', '.textC');
+});
     </script>
 </body>
 
